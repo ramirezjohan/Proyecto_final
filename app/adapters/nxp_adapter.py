@@ -1,4 +1,5 @@
-
+# PRMER CODIGO
+"""
 from .base_adapter import BaseAdapter
 
 GPIO_TEMPLATE = {
@@ -27,3 +28,33 @@ class NXPAdapter(BaseAdapter):
             return UART_TEMPLATE["init"].format(uart=uart, baud_reg=baud_reg)
         else:
             return "// Periférico no soportado aún\n"
+"""
+# SEGUNDO CODIGO
+
+from .base_adapter import BaseAdapter
+
+class NXPAdapter(BaseAdapter):
+    def generate_code(self, peripheral):
+        model = getattr(peripheral, "model", "") or ""
+        name = peripheral.name or ""
+        port = name[-1].upper() if name else "A"
+        pin = peripheral.config.get("pin", 0)
+
+        # Validación: muchos NXP/Kinetis usan puertos de 0..31
+        if not isinstance(pin, int):
+            raise ValueError(f"Error: El número de pin debe ser entero. Valor: {pin}")
+        if not (0 <= pin <= 31):
+            raise ValueError(f"Error: Pin {pin} fuera de rango válido (0–31) para {model or 'NXP'}.")
+
+        lines = []
+        # Nota: NXP tiene familias distintas (Kinetis, LPC...). Aquí usamos una generación
+        # práctica y genérica (placeholders claros) que funcionan como plantilla para Keil.
+        lines.append(f"/* Habilitar reloj al puerto {port} - ajustar según MCU */")
+        lines.append(f"CLOCK_ENABLE_PORT({port});")
+        lines.append(f"/* Configurar multiplexado a GPIO (ajustar macro PORT_PCR_MUX según SDK) */")
+        lines.append(f"PORT{port}->PCR[{pin}] = PORT_PCR_MUX(1);  /* PIN -> GPIO */")
+        # Dirección y toggle (estilo Kinetis: PDDR/PTOR). Ajustar si tu familia usa otros registros.
+        lines.append(f"GPIO{port}->PDDR |= (1u << {pin});  /* configurar como salida */")
+        lines.append(f"GPIO{port}->PTOR = (1u << {pin});   /* toggle */")
+
+        return "\n".join(lines)

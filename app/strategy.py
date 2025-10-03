@@ -17,17 +17,30 @@ class CodeGenerationStrategy:
 
     def generate(self, peripheral):
         return self.adapter.generate_code(peripheral) """
-
+"""
 from app.plugins.registry import get_plugin
 
 class CodeGenerationStrategy:
-    def __init__(self, manufacturer: str):
+    def __init__(self, manufacturer: str, mcu_model: str = None):
         self.manufacturer = manufacturer
+        plugin_cls = get_plugin(manufacturer)
+        self.adapter = plugin_cls().get_adapter()
+        self.mcu_model = mcu_model  # nuevo
+
+    def generate(self, peripheral):
+        #return peripheral.generate_code(self.manufacturer, self.mcu_model)
+        return self.adapter.generate_code(peripheral)
+"""
+from app.plugins.registry import get_plugin
+
+class CodeGenerationStrategy:
+    def __init__(self, manufacturer: str, mcu_model: str = None):
+        self.manufacturer = manufacturer
+        self.mcu_model = mcu_model
         plugin_cls = get_plugin(manufacturer)
         self.adapter = plugin_cls().get_adapter()
 
     def generate(self, peripheral):
         return self.adapter.generate_code(peripheral)
-
 
 
