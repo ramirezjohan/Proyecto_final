@@ -49,12 +49,15 @@ class NXPAdapter(BaseAdapter):
         lines = []
         # Nota: NXP tiene familias distintas (Kinetis, LPC...). Aquí usamos una generación
         # práctica y genérica (placeholders claros) que funcionan como plantilla para Keil.
-        lines.append(f"/* Habilitar reloj al puerto {port} - ajustar según MCU */")
-        lines.append(f"CLOCK_ENABLE_PORT({port});")
-        lines.append(f"/* Configurar multiplexado a GPIO (ajustar macro PORT_PCR_MUX según SDK) */")
-        lines.append(f"PORT{port}->PCR[{pin}] = PORT_PCR_MUX(1);  /* PIN -> GPIO */")
-        # Dirección y toggle (estilo Kinetis: PDDR/PTOR). Ajustar si tu familia usa otros registros.
-        lines.append(f"GPIO{port}->PDDR |= (1u << {pin});  /* configurar como salida */")
-        lines.append(f"GPIO{port}->PTOR = (1u << {pin});   /* toggle */")
+        lines.append(f"/* Habilitar reloj al puerto {port} */")
+        lines.append(f"SIM->SCGC5 |= ({port});\n\r")
+        lines.append(f"/* Configurar MUX a GPIO */")
+        lines.append(f"PORT{port}->PCR[{pin}] = PORT_PCR_MUX(1);  /* PIN como GPIO */ \n\r")
+
+        # Dirección y toggle (PDDR/PTOR).
+        lines.append(f"====PT{port} como salida==== \n\r")
+        lines.append(f"PT{port}->PDDR |= (1u << {pin});\n\r")
+        lines.append(f"====PT{port} en funcion del tiempo==== \n\r")
+        lines.append(f"PT{port}->PTOR = (1u << {pin}); \n\r")
 
         return "\n".join(lines)

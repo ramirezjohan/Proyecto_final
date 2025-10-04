@@ -152,7 +152,7 @@ class STM32Adapter(BaseAdapter):
 
 
 
-        # STM32F1 (ej: F103) → CRL/CRH
+        # Familia STM32F1 registro CRL/CRH
         if ("F1" in model) or ("F103" in model) or model.upper().startswith("STM32F1"):
             if pin < 8:
                 reg = "CRL"
@@ -164,19 +164,23 @@ class STM32Adapter(BaseAdapter):
             port_rcc = {"A":2, "B":3, "C":4, "D":5, "E":6}
             lines = []
             if port in port_rcc:
-                lines.append(f"RCC->APB2ENR |= (1 << {port_rcc[port]});")
+                lines.append(f"==== Configuracion del reloj para GPIO{port} ====\n\r")
+                lines.append(f"RCC->APB2ENR |= (1 << {port_rcc[port]});\n\r")
             lines.append(f"GPIO{port}->{reg} &= ~(0xF << {offset});")
             lines.append(f"GPIO{port}->{reg} |=  (0x2 << {offset});")
             lines.append(f"GPIO{port}->ODR ^= (1 << {pin});")
             return "\n".join(lines)
 
-        # STM32F4/F7 → MODER
+        # Registro MODER para la familia STM32F4/F7
         else:
             port_rcc_f4 = {"A":0,"B":1,"C":2,"D":3,"E":4}
             lines = []
             if port in port_rcc_f4:
-                lines.append(f"RCC->AHB1ENR |= (1 << {port_rcc_f4[port]});")
+                lines.append(f"==== Configuracion de reloj para GPIO{port} ====\n\r")
+                lines.append(f"RCC->AHB1ENR |= (1 << {port_rcc_f4[port]});\n\r")
+            lines.append(f"==== Configuracion del modo del Pin ====\n\r")
             lines.append(f"GPIO{port}->MODER &= ~(3 << ({pin}*2));")
             lines.append(f"GPIO{port}->MODER |=  (1 << ({pin}*2));")
+            lines.append(f"==== Configuracion del estado del Pin =====\n\r")
             lines.append(f"GPIO{port}->ODR ^= (1 << {pin});")
             return "\n".join(lines)

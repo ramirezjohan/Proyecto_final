@@ -277,15 +277,16 @@ import app.plugins.nxp_plugin
 import app.plugins.ti_plugin
 
 from app.code_generator import CodeGenerator
+from app.plugins import registry as plugin_registry # Importacion de registros
 
 def main():
-    print("=== Generador de Código para Keil UV5 ===")
+    print("=== Generador de Código para Keil UV5 === \n\r")
 
     # Paso 1 — Leer y normalizar entradas
-    manufacturer = input("Fabricante (ej: STM32): ").strip().upper()
+    manufacturer = input("Fabricante: ").strip().upper()
     mcu_model = input("MCU_model: ").strip().upper()
-    peripheral_type = input("Tipo de periférico (ej: GPIO): ").strip().upper()
-    name = input("Nombre (ej: GPIOC): ").strip().upper()
+    peripheral_type = input("Tipo de periférico: ").strip().upper()
+    name = input("Nombre: ").strip().upper()
 
     # Paso 2 — Validar entradas básicas
     VALID_MANUFACTURERS = ["STM32", "NXP", "TI"]
@@ -314,7 +315,7 @@ def main():
         config["mode"] = mode
 
         try:
-            pin_number = int(input("Número de pin (ej: 13): ").strip())
+            pin_number = int(input("Número de pin: ").strip())
             config["pin"] = pin_number
         except ValueError:
             print("Error: el número de pin debe ser un entero.")
@@ -326,7 +327,7 @@ def main():
         generator.add_peripheral(peripheral_type, name, config)
         final_code = generator.build()
 
-        print("\n=== Código generado ===")
+        print("\n=== Código generado === \n\r")
         print(final_code)
     except ValueError as e:
         print(f"Error: {e}")
