@@ -1,17 +1,17 @@
 
 #include <stm32f767xx.h>
+
+// Funcion de perdida de tiempo
 void delay_ms(uint16_t n);
 
 int main()
 {
-	RCC->AHB1ENR |= (1 << 1);
-	
-	GPIOB->MODER &= ~(3 << (7*2));
-  GPIOB->MODER |=  (1 << (7*2));
+	// Configuracion de reloj
+
+	// Configuracion de modo de puerto
 	
 	while(1)
 	{
-		GPIOB->ODR ^= (1 << 7);
 		delay_ms(200);
 	}
 }

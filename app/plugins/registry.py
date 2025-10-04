@@ -25,7 +25,7 @@ import importlib
 plugin_registry: dict = {}
 
 def register_manufacturer(name: str):
-    """Decorador (compatible con plugins existentes que usan @register_manufacturer)."""
+    """Decorador """
     def decorator(cls):
         plugin_registry[name.upper()] = cls
         return cls
@@ -38,7 +38,7 @@ def get_plugin(name: str):
     return plugin_registry[key]
 
 def list_registered() -> list:
-    """Lista de fabricantes registrados (nombres en mayúsculas)."""
+    """Lista de fabricantes registrados."""
     return list(plugin_registry.keys())
 
 def register_all_plugins(plugin_module_names: list = None):
